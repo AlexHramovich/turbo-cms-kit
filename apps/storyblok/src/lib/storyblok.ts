@@ -14,6 +14,7 @@ export const getStoryblokApi = storyblokInit({
 export async function fetchStory(
   version: "draft" | "published",
   slug?: string[],
+  language?: string,
 ) {
   getStoryblokApi();
   const correctSlug = `/${slug ? slug.join("/") : "home"}`;
@@ -22,6 +23,10 @@ export async function fetchStory(
     version,
     token: process.env.NEXT_PUBLIC_STORYBLOK_TOKEN || "",
   });
+
+  if (language) {
+    searchParams.set("language", language);
+  }
 
   const data = await fetcher(
     `${process.env.NEXT_PUBLIC_STORYBLOK_API_GATE}/stories${correctSlug}?${searchParams.toString()}`,
@@ -60,10 +65,11 @@ export async function fetchStories(
 export async function fetchStoryMetadata(
   version: "draft" | "published",
   slug?: string[],
+  language?: string,
 ) {
   const {
     data: { story },
-  } = await fetchStory(version, slug);
+  } = await fetchStory(version, slug, language);
 
   if (!story) {
     console.log(`missing metadata for story: ${slug?.join("/")}`);
